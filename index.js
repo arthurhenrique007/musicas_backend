@@ -22,9 +22,7 @@ app.get("/", (request, response) => {
     sql.query(comandoSelect, (error, data) => {
         if (error) {
             console.log(error)
-            return response.status(500).json({
-                mensagem: "Erro ao buscar músicas!"
-            })
+            return
         }
 
         response.json(data)
@@ -36,23 +34,13 @@ app.delete("/apagar/:id", (request, response) => {
 
     const comandoDelete = "DELETE FROM musicas_arthurhenrique WHERE id = ?"
 
-    sql.query(comandoDelete, [id], (error, resultado) => {
+    sql.query(comandoDelete, [id], (error) => {
         if (error) {
             console.log(error)
-            return response.status(500).json({
-                mensagem: "Erro ao apagar música!"
-            })
+            return
         }
 
-        if (resultado.affectedRows === 0) {
-            return response.status(404).json({
-                mensagem: "Música não encontrada!"
-            })
-        }
-
-        response.json({
-            mensagem: "Música apagada com sucesso!"
-        })
+        response.json({ mensagem: "Música apagada com sucesso!" })
     })
 })
 
@@ -64,9 +52,7 @@ app.post("/cadastrar", (request, response) => {
     sql.query(comandoInsert, [titulo, artista, genero, ano, duracao], (error) => {
         if (error) {
             console.log(error)
-            return response.status(500).json({
-                mensagem: "Erro ao cadastrar música!"
-            })
+            return
         }
 
         response.status(201).json({
