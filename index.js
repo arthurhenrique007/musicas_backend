@@ -1,7 +1,9 @@
+
 import express from "express"
 import cors from "cors"
 import mysql2 from "mysql2"
 import "dotenv/config"
+
 const app = express()
 
 app.use(express.json())
@@ -18,19 +20,62 @@ app.get("/", (request, response) => {
     const comandoSelect = "SELECT * FROM musicas_arthurhenrique"
 
     sql.query(comandoSelect, (error, data) => {
-  if (error){
-      console.log(error)
-      return
-  }
-  else {
-    response.json(data) 
-  }
+        if (error) {
+            console.log(error)
+            return response.status(500).json({
+                mensagem: "Erro ao buscar músicas!"
+            })
+        }
 
+        response.json(data)
+    })
 })
-  
-  })
 
-app.listen (3000, () => {
+app.delete("/apagar/:id", (request, response) => {
+    const { id } = request.params
+
+    const comandoDelete = "DELETE FROM musicas_arthurhenrique WHERE id = ?"
+
+    sql.query(comandoDelete, [id], (error, resultado) => {
+        if (error) {
+            console.log(error)
+            return response.status(500).json({
+                mensagem: "Erro ao apagar música!"
+            })
+        }
+
+        if (resultado.affectedRows === 0) {
+            return response.status(404).json({
+                mensagem: "Música não encontrada!"
+            })
+        }
+
+        response.json({
+            mensagem: "Música apagada com sucesso!"
+        })
+    })
+})
+
+app.post("/cadastrar", (request, response) => {
+    const { titulo, artista, genero, ano, duracao } = request.body
+
+    const comandoInsert = "INSERT INTO musicas_arthurhenrique(titulo, artista, genero, ano, duracao) VALUES (?, ?, ?, ?, ?)"
+
+    sql.query(comandoInsert, [titulo, artista, genero, ano, duracao], (error) => {
+        if (error) {
+            console.log(error)
+            return response.status(500).json({
+                mensagem: "Erro ao cadastrar música!"
+            })
+        }
+
+        response.status(201).json({
+            mensagem: "Música cadastrada com sucesso!"
+        })
+    })
+})
+
+app.listen(3000, () => {
     console.log("Servidor rodando na porta 3000!")
 })
 
